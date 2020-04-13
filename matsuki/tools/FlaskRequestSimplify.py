@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: Sep 19, 2018
-# Modifi: Apr 07, 2020
+# Modifi: Apr 10, 2020
 
 from flask import request
+
 from siki.basics.Hashcode import md5
+
 from werkzeug.local import LocalProxy
 
 
@@ -83,22 +85,26 @@ def simplify_request(request: LocalProxy):
     * [request] request handler of flask framework
     
     @Returns:
-    * [dict(str:str)] request parameters are simplified to a python dict type
+    * [tuple(dict, dict)] request parameters are simplified to a python tuple type, first one is args, second one is files
     """
     # simplify GET/POST request
     args = None
+    files = None
     params = get_request_params(request)
     
-    # 简化POST形式
+    # simpilify the POST args
     if 'POST' == params['http_request']:
         if params['form'] is None and params['args'] is not None:
             args = params['args']
         else:
             args = params['form']
 
-    # 简化GET形式
+    # simpilify the GET args
     if 'GET' == params['http_request']:
         args = params['args']
     
+    if params['files']:
+        files = params['files']
+
     # return
-    return args
+    return args, files
