@@ -4,13 +4,12 @@
 # LastChg: Apr 10, 2020
 
 import os
-
-from siki.basics import FileUtils
-from matsuki.filemanager.Common import allowed_ext, rename_file
-
 from flask import send_from_directory
+from werkzeug import FileStorage
+from siki.basics import FileUtils, TimeTicker
 
-def allowed_ext(filename, *fileExts):
+
+def allowed_ext(filename, fileExts):
     """
     the file extension is allowed to upload to server
     """
@@ -29,7 +28,7 @@ def rename_file(filename:str):
     return new_filename
 
 
-def upload(dirPath:str, file:object, rename:bool, *allowFileExts):
+def upload(dirPath: str, file: FileStorage, rename: bool, *allowFileExts):
     """
     file-upload interface, given a folder and a file from request, then saving it!
 
@@ -48,7 +47,10 @@ def upload(dirPath:str, file:object, rename:bool, *allowFileExts):
     if not FileUtils.exists(dirPath):
         FileUtils.mkdir(dirPath)
     
-    if file and allowed_ext(file.filename, allowFileExts):
+    if not isinstance(file, FileStorage):
+        return False, "file is not the type of werkzeug.FileStorage"
+
+    if allowed_ext(file.filename, allowFileExts):
         success_name = None
 
         if rename:
@@ -60,16 +62,18 @@ def upload(dirPath:str, file:object, rename:bool, *allowFileExts):
 
         return True, success_name
     
-    return False, None
+    return False, "file extension is not allowed"
 
 
-def update(dirPath: str, file: object, targetName: str, *allowFileExts):
+
+
+def update(dirPath: str, file: FileStorage, targetName: str, *allowFileExts):
     """
     file-update interface, to update a server-side file by given the filename, file object, and file-stored folder path
 
     @Args:
     * [dirPath] str
-    * [file] request.files
+    * [file] FileStorage
     * [targetName] target file name
     * [allowFileExts] list of str
 

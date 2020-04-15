@@ -99,11 +99,11 @@ class ArgsMappingToken(object):
         * [dict(str:obj)] dict type
         """
 
-        if not FileUtils.exists(rulefile):
+        if not FileUtils.exists(ruleFile):
             raise Exceptions.NoAvailableResourcesFoundException("file: {} not found".format(rulefile))
 
         # parse the file
-        for line in open(rulefile, "rt"):
+        for line in open(ruleFile, "rt"):
             # trim tailer
             line = self.trim_tailer_from_text(line)
 
@@ -155,8 +155,24 @@ class ArgsMappingToken(object):
         # and then perform regular filtering on the parameters
         filtered_args = self.use_args_regular_check(self.tokens, args)
 
-        return filtered_args        
+        return filtered_args
 
+
+    
+def apply_reg_rules(rules, args):
+    """
+    Regular matching rules can be read from a file or from a matching list
+    """
+
+    amt = ArgsMappingToken()
+
+    if isinstance(rules, str):# read from file
+        return amt.parsing_reg_file(rules, args)
+    
+    if isinstance(rules, list):
+        return amt.parsing_reg_rules(rules, args)
+    
+    return None
 
 
 if __name__ == "__main__":

@@ -26,14 +26,14 @@ def siki_verified_args(request: LocalProxy, xmlfile: str):
 
     @Returns:
     * [bool] success or failed
-    * [dict(str:obj)] if success, or failed with json message returned
+    * [dict(str:obj)] if success return http arguments, or failed with json message returned
+    * [dict(str:obj)] not always, {dict: file}
     """
 
     # simplify the HTTP request
     flask_args = FlaskRequestSimplify.simplify_request(request)
-    args = flask_args[0]
 
-    if args is None: # no variables found
+    if flask_args[0] is None: # no variables found
         return False, jsonify(response(HttpCode.CERR_Not_Acceptable, encode(MatsukiCode.OK_GENERAL_FALSE), 
             "you cannot do that!"))
     
@@ -43,8 +43,15 @@ def siki_verified_args(request: LocalProxy, xmlfile: str):
             encode(MatsukiCode.OK_GENERAL_FALSE, MatsukiCode.SERV_UNIMPLEMENTED_ERROR),
             "rule file is broken"))
 
+    # update filtered arguments
+    args = ArgsUsesSikiComplianceCheck.apply_siki_rules(xmlfile, args)
+
     # return to caller filtered result
-    return True, ArgsUsesSikiComplianceCheck.apply_siki_rules(xmlfile, args), flask_args[1]
+    if flask_args[1]:
+        return True, args, flask_args[1]
+    
+    else:
+        return True, args
 
 
 
@@ -59,14 +66,14 @@ def regular_verified_args(request: LocalProxy, rulefile: str):
 
     @Returns:
     * [bool] success or failed
-    * [dict(str:obj)] if success, or failed with json message returned
+    * [dict(str:obj)] if success return http arguments, or failed with json message returned
+    * [dict(str:obj)] not always, {dict: file}
     """
 
     # simplify the HTTP request
     flask_args = FlaskRequestSimplify.simplify_request(request)
-    args = flask_args[0]
 
-    if args is None: # no variables found
+    if flask_args[0] is None: # no variables found
         return False, jsonify(response(HttpCode.CERR_Not_Acceptable, encode(MatsukiCode.OK_GENERAL_FALSE), 
             "you cannot do that!"))
     
@@ -76,5 +83,12 @@ def regular_verified_args(request: LocalProxy, rulefile: str):
             encode(MatsukiCode.OK_GENERAL_FALSE, MatsukiCode.SERV_UNIMPLEMENTED_ERROR),
             "rule file is broken"))
 
+    # update filtered arguments
+    args = ArgsUsesRegularExpression.apply_reg_rules(rulefile, flask_args[0])
+
     # return to caller filtered result
-    return True, ArgsUsesRegularExpression.apply_reg_exp(rulefile, args), flask_args[1]
+    if flask_args[1]:
+        return True, args, flask_args[1]
+    
+    else:
+        return True, args
