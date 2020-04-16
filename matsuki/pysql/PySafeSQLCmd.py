@@ -5,7 +5,7 @@
 
 import re
 
-from siki.pysql import PySQLConnection as pys
+from matsuki.pysql import PySQLConnection as pys
 from siki.basics import Exceptions as excepts
 
 def _has_keywords(arg):

@@ -63,7 +63,9 @@ class ArgsMappingToken(object):
             token = self.search_token(key)
 
             if not token:
-                raise Exceptions.NoAvailableResourcesFoundException("key: {} in args not matched to token list".format(key))
+                finalDict[key] = None
+                continue
+                # raise Exceptions.NoAvailableResourcesFoundException("key: {} in args not matched to token list".format(key))
 
             # do regular check
             if re.match(token.regular, val) is not None:

@@ -5,7 +5,7 @@
 
 import enum
 
-class MatsukiCode(enum.IntEnum):
+class Code(enum.IntEnum):
 
     ##### GENERAL PROCESS ####                                *
     OK_GENERAL_TRUE             = 0x00000001 # 0x0 00 0 0 0 0 1 - logical flow and result ok

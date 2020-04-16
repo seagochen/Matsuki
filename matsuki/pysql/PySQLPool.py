@@ -3,7 +3,7 @@
 # Create: Sep 15, 2018
 # Modifi: Mar 17, 2020
 
-from siki.pysql import PySQLConnection as pys
+from matsuki.pysql import PySQLConnection as pys
 from siki.basics.Logger import Logger
 from siki.basics.Logger import Priority as p
 from siki.basics import Exceptions as excepts

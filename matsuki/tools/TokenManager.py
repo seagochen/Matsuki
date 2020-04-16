@@ -15,7 +15,6 @@ from siki.basics import TimeTicker as ticker
 from siki.basics import Exceptions as excepts
 from siki.basics import Convert as convert
 from siki.dstruct import DictExtern
-from siki.pysql import SafeSQLCmd
 
 class TOKEN_STATUS(IntEnum):
     

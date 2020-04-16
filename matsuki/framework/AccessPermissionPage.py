@@ -10,6 +10,7 @@ from matsuki.HttpCode import HttpCode, response
 from matsuki.tools import TokenManager
 from matsuki.tools.TokenManager import TOKEN_STATUS
 
+
 def verify_user_permission(args:dict, secretKey:str):
     """
     verify user access permission

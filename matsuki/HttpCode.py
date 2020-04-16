@@ -5,10 +5,9 @@
 
 from enum import IntEnum
 
-from matsuki.MatsukiCode import MatsukiCode
 from siki.basics import Convert
 
-class HttpCode(IntEnum):
+class Code(IntEnum):
 
     '''2xx Success'''
 
@@ -335,11 +334,11 @@ class HttpCode(IntEnum):
 
 
 
-def response(httpcode: HttpCode, matsukicode: MatsukiCode,  msg = None, data = None):
+def response(httpcode, matsukicode,  msg = None, data = None):
     res = {}
 
     # convert enum to int
-    res['status'] = int(httpcode)
+    res['http'] = int(httpcode)
     res['code']   = int(matsukicode) 
 
     # convert msg if necessary

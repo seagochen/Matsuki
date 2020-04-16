@@ -8,8 +8,11 @@ from flask import request, jsonify
 from matsuki.argspattern import ArgsUsesRegularExpression
 from matsuki.argspattern import ArgsUsesSikiComplianceCheck
 from matsuki.tools import FlaskRequestSimplify
-from matsuki.MatsukiCode import MatsukiCode, encode
-from matsuki.HttpCode import HttpCode, response
+
+from matsuki.MatsukiCode import Code as ki
+from matsuki.MatsukiCode import encode
+from matsuki.HttpCode import Code as http
+from matsuki.HttpCode import response
 
 from werkzeug.local import LocalProxy
 
@@ -34,13 +37,13 @@ def siki_verified_args(request: LocalProxy, xmlfile: str):
     flask_args = FlaskRequestSimplify.simplify_request(request)
 
     if flask_args[0] is None: # no variables found
-        return False, jsonify(response(HttpCode.CERR_Not_Acceptable, encode(MatsukiCode.OK_GENERAL_FALSE), 
+        return False, jsonify(response(http.CERR_Not_Acceptable, encode(ki.OK_GENERAL_FALSE), 
             "you cannot do that!"))
     
     # verify parameters
     if not FileUtils.exists(xmlfile):
-        return False, jsonify(response(HttpCode.SERR_Internal_Server_Error, 
-            encode(MatsukiCode.OK_GENERAL_FALSE, MatsukiCode.SERV_UNIMPLEMENTED_ERROR),
+        return False, jsonify(response(http.SERR_Internal_Server_Error, 
+            encode(ki.OK_GENERAL_FALSE, ki.SERV_UNIMPLEMENTED_ERROR),
             "rule file is broken"))
 
     # update filtered arguments
@@ -74,13 +77,13 @@ def regular_verified_args(request: LocalProxy, rulefile: str):
     flask_args = FlaskRequestSimplify.simplify_request(request)
 
     if flask_args[0] is None: # no variables found
-        return False, jsonify(response(HttpCode.CERR_Not_Acceptable, encode(MatsukiCode.OK_GENERAL_FALSE), 
+        return False, jsonify(response(http.CERR_Not_Acceptable, encode(ki.OK_GENERAL_FALSE), 
             "you cannot do that!"))
     
     # verify parameters
     if not FileUtils.exists(rulefile):
-        return False, jsonify(response(HttpCode.SERR_Internal_Server_Error, 
-            encode(MatsukiCode.OK_GENERAL_FALSE, MatsukiCode.SERV_UNIMPLEMENTED_ERROR),
+        return False, jsonify(response(http.SERR_Internal_Server_Error, 
+            encode(ki.OK_GENERAL_FALSE, ki.SERV_UNIMPLEMENTED_ERROR),
             "rule file is broken"))
 
     # update filtered arguments

@@ -8,7 +8,7 @@ from siki.basics import Convert as convert
 from siki.basics import JsonUtils as jutil
 from siki.basics import Exceptions as excepts
 
-from siki.pyredis.PyRedisPool import PyRedisPool
+from matsuki.pyredis.PyRedisPool import PyRedisPool
 
 import sys
 import base64

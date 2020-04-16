@@ -16,6 +16,9 @@ def get_request_params(request: LocalProxy):
     
     @Args:
     * [request] werkzeug.local.LocalProxy, the flask request
+
+    @Returns:
+    * [dict], {'args': http_url_args, 'form': http_form_args, 'files': list of FileStorage}
     """
 
     params = {}
@@ -58,7 +61,10 @@ def get_request_params(request: LocalProxy):
 
     # adding files to redis
     if len(request.files) > 0:
-        params['files'] = request.files
+        params['files'] = []
+        
+        for fn in request.files:
+            params['files'].append(request.files[fn])
     else:
         params['files'] = None
 
