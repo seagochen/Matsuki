@@ -20,6 +20,7 @@ def database_do_action(database: PySQLPool, do_action: object, *args):
         raise Exceptions.NoAvailableResourcesFoundException("database is not available")
     
     conn = None
+
     try:
         # get connection from pool
         conn = database.get_connection()
@@ -30,9 +31,9 @@ def database_do_action(database: PySQLPool, do_action: object, *args):
 
         # send database connection to callback function
         if args is None:
-            do_action(conn)
+            return do_action(conn)
         else:
-            do_action(conn, args)
+            return do_action(conn, args)
 
     finally:
         if conn:
