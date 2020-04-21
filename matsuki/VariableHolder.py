@@ -59,3 +59,10 @@ class VariableHolder(threading.Thread):
     
     def close(self):
         self.flag = False
+
+    
+
+def create_variableHolder():
+    holder =  VariableHolder()
+    holder.start()
+    return holder
