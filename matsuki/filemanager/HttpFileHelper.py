@@ -20,7 +20,7 @@ def rename_file(filename:str):
     ext = filename.rsplit('.', 1)[1]
    
     # 创建以时间为蓝本的文件名    
-    unix_time = TimeTicker.time_now_foramt("%Y%m%d%H%M%S%f")
+    unix_time = TimeTicker.time_now_with_foramt("%Y%m%d%H%M%S%f")
 
     # 修改文件名
     new_filename = unix_time + '.' + ext   

@@ -63,7 +63,6 @@ class ArgsMappingToken(object):
             token = self.search_token(key)
 
             if not token:
-                finalDict[key] = None
                 continue
                 # raise Exceptions.NoAvailableResourcesFoundException("key: {} in args not matched to token list".format(key))
 

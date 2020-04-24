@@ -47,7 +47,7 @@ def siki_verified_args(request: LocalProxy, xmlfile: str):
             "rule file is broken"))
 
     # update filtered arguments
-    args = ArgsUsesSikiComplianceCheck.apply_siki_rules(xmlfile, args)
+    args = ArgsUsesSikiComplianceCheck.apply_siki_rules(xmlfile, flask_args[0])
 
     # return to caller filtered result
     if flask_args[1]:

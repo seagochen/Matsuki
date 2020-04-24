@@ -21,6 +21,7 @@ class Code(enum.IntEnum):
     ##### DATABASE ERRORS ####                            *
     DATABASE_CONNECTION_ERROR   = 0X00000100 # 0X0 00 0 0 1 0 0 - database has connection error
     DATABASE_INVALID_STATEMENT  = 0X00000200 # 0X0 00 0 0 2 0 0 - database statement is invalid
+    DATABASE_HAS_DUMPS          = 0x00000300 # 0x0 00 0 0 3 0 0 - database found dumplicated data
     DATABASE_NO_DATA_FOUND      = 0X00000C00 # 0X0 00 0 0 C 0 0 - database no data was found
     DATABASE_UNKNOWN_ERROR      = 0x00000F00 # 0x0 00 0 0 F 0 0 - database found unknown error
     DATABASE_DATA_FOUND         = 0x00000000 # 0x0 00 0 0 0 0 0 - database ok
@@ -33,8 +34,13 @@ class Code(enum.IntEnum):
     CACHED_UNKNOWN_ERROR        = 0x0000F000 # 0x0 00 0 F 0 0 0 - data cached found unknown error
     CACHED_RESOURCE_FOUND       = 0X00000000 # 0X0 00 0 0 0 0 0 - data cached ok
 
-    #### RESERVED STATES ####              *
-    #RESERVED_ERROR             = # 0x0 00 0 0 0 0 0 - reserved error
+    #### RESERVED STATES ####                         *
+    FILE_CANNOT_WRITE           = 0x00010000 # 0x0 00 1 0 0 0 0 - file write failed
+    FILE_CANNOT_READ            = 0x00020000 # 0x0 00 2 0 0 0 0 - file read failed
+    FILE_NOT_FOUND              = 0x00030000 # 0x0 00 3 0 0 0 0 - file not found
+    FILE_HAS_DUMPS              = 0x00040000 # 0x0 00 4 0 0 0 0 - file has dumplicated files
+    FILE_HAS_LOCKED             = 0x00050000 # 0x0 00 5 0 0 0 0 - file is locked by other thread/program
+    FILE_OPERATION_DONE         = 0x00000000 # 0x0 00 0 0 0 0 0 - file operations done
 
     ##### SERVER ERRORS ####                       **
     SERV_UNEXCEPT_ERROR         = 0X0FF00000 # 0X0 FF 0 0 0 0 0 # server side unexcepted error
