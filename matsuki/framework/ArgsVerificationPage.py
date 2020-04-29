@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Apr 09, 2020
-# LastChg: Apr 09, 2020
+# LastChg: Apr 24, 2020
 
 from flask import request, jsonify
 
@@ -19,13 +19,14 @@ from werkzeug.local import LocalProxy
 from siki.basics import FileUtils
 
 
-def siki_verified_args(request: LocalProxy, xmlfile: str):
+def siki_verified_args(request: LocalProxy, xml: object, fromFile = True):
     """
     expand the parameters from the http request and simplify the process of obtaining the parameters
 
     @Args:
     * [request] LocalProxy type, the request from flask
-    * [xmlfile] str type, the path of siki parameter check
+    * [xml] str type, the path of siki-style xml file, or string
+    * [fromFile] default is true, means xml source comes from file, set to false, could read configurations from xml string
 
     @Returns:
     * [bool] success or failed
@@ -37,35 +38,36 @@ def siki_verified_args(request: LocalProxy, xmlfile: str):
     flask_args = FlaskRequestSimplify.simplify_request(request)
 
     if flask_args[0] is None: # no variables found
-        return False, jsonify(response(http.CERR_Not_Acceptable, encode(ki.OK_GENERAL_FALSE), 
-            "you cannot do that!"))
+        return False, "flask arguments are none", None
     
     # verify parameters
-    if not FileUtils.exists(xmlfile):
-        return False, jsonify(response(http.SERR_Internal_Server_Error, 
-            encode(ki.OK_GENERAL_FALSE, ki.SERV_UNIMPLEMENTED_ERROR),
-            "rule file is broken"))
+    if fromFile and not FileUtils.exists(xml):
+        return False, "rule file is broken", None
 
     # update filtered arguments
-    args = ArgsUsesSikiComplianceCheck.apply_siki_rules(xmlfile, flask_args[0])
+    args = ArgsUsesSikiComplianceCheck.apply_siki_rules(xml, flask_args[0], fromFile)
+
+    if len(args) <= 0:
+        return False, "no arguments passed the check", None
 
     # return to caller filtered result
     if flask_args[1]:
         return True, args, flask_args[1]
     
     else:
-        return True, args
+        return True, args, None
 
 
 
 
-def regular_verified_args(request: LocalProxy, rulefile: str):
+def regular_verified_args(request: LocalProxy, rule: str, fromFile = True):
     """
     expand the parameters from the http request and simplify the process of obtaining the parameters
 
     @Args:
     * [request] LocalProxy type, the request from flask
-    * [rulefile] str type, the path of regular parameter check
+    * [rule] str type, the path of regular check file, or lists of regular expressions
+    * [fromFile] default is true, means source comes from a file, set to false, could read configurations from list
 
     @Returns:
     * [bool] success or failed
@@ -77,21 +79,21 @@ def regular_verified_args(request: LocalProxy, rulefile: str):
     flask_args = FlaskRequestSimplify.simplify_request(request)
 
     if flask_args[0] is None: # no variables found
-        return False, jsonify(response(http.CERR_Not_Acceptable, encode(ki.OK_GENERAL_FALSE), 
-            "you cannot do that!"))
+        return False, "flask arguments are none", None
     
     # verify parameters
-    if not FileUtils.exists(rulefile):
-        return False, jsonify(response(http.SERR_Internal_Server_Error, 
-            encode(ki.OK_GENERAL_FALSE, ki.SERV_UNIMPLEMENTED_ERROR),
-            "rule file is broken"))
+    if fromFile and not FileUtils.exists(rule):
+        return False, "rule file is broken", None
 
     # update filtered arguments
-    args = ArgsUsesRegularExpression.apply_reg_rules(rulefile, flask_args[0])
+    args = ArgsUsesRegularExpression.apply_reg_rules(rule, flask_args[0])
+
+    if len(args) <= 0:
+        return False, "no arguments passed the check", None
 
     # return to caller filtered result
     if flask_args[1]:
         return True, args, flask_args[1]
     
     else:
-        return True, args
+        return True, args, None

@@ -344,13 +344,13 @@ def response(httpcode, matsukicode,  msg = None, data = None):
     # convert msg if necessary
     if msg is not None:
         if isinstance(msg, bytes):
-            res['message'] = Convert.binary_to_string(msg)
+            res['feedback'] = Convert.binary_to_string(msg)
         elif isinstance(msg, list):
-            res['message'] = Convert.list_to_string(msg)
+            res['feedback'] = Convert.list_to_string(msg)
         elif isinstance(msg, dict):
-            res['message'] = Convert.dict_to_string(msg)
+            res['feedback'] = Convert.dict_to_string(msg)
         else:
-            res['message'] = str(msg)
+            res['feedback'] = str(msg)
     
     # convert data if necessary
     if data is not None:

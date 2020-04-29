@@ -4,8 +4,6 @@
 # LastChg: Apr 10, 2020
 
 import os
-from flask import send_from_directory
-from werkzeug import FileStorage
 from siki.basics import FileUtils, TimeTicker
 
 
@@ -28,7 +26,7 @@ def rename_file(filename:str):
     return new_filename
 
 
-def upload(dirPath: str, file: FileStorage, rename: bool, *allowFileExts):
+def upload(dirPath: str, file: object, rename: bool, *allowFileExts):
     """
     file-upload interface, given a folder and a file from request, then saving it!
 
@@ -47,8 +45,8 @@ def upload(dirPath: str, file: FileStorage, rename: bool, *allowFileExts):
     if not FileUtils.exists(dirPath):
         FileUtils.mkdir(dirPath)
     
-    if not isinstance(file, FileStorage):
-        return False, "file is not the type of werkzeug.FileStorage"
+    if not file:
+        return False, "file is null"
 
     if allowed_ext(file.filename, allowFileExts):
         success_name = None
@@ -67,13 +65,13 @@ def upload(dirPath: str, file: FileStorage, rename: bool, *allowFileExts):
 
 
 
-def update(dirPath: str, file: FileStorage, targetName: str, *allowFileExts):
+def update(dirPath: str, file: object, targetName: str, *allowFileExts):
     """
     file-update interface, to update a server-side file by given the filename, file object, and file-stored folder path
 
     @Args:
     * [dirPath] str
-    * [file] FileStorage
+    * [file] object
     * [targetName] target file name
     * [allowFileExts] list of str
 
@@ -101,7 +99,7 @@ def update(dirPath: str, file: FileStorage, targetName: str, *allowFileExts):
 
     
 
-def download(dirPath: str, filename: str, as_attachment = True):
+def download(dirPath: str, filename: str):
     """
     file-download interface, download a file from the server
 
@@ -123,5 +121,5 @@ def download(dirPath: str, filename: str, as_attachment = True):
         return False, "the file not exists"
     
     # given caller the download link
-    return True, send_from_directory(dirPath, filename, as_attachment = as_attachment)
+    return True, FileUtils.gen_filepath(dirPath, filename)
 
