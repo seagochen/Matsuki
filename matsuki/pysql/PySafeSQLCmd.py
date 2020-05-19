@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: May 08, 2018
-# Modified: Feb 18, 2020
+# Modified: May 19, 2020
 
 import re
 
-from matsuki.pysql import PySQLConnection as pys
-from siki.basics import Exceptions as excepts
+from matsuki.pysql import PySQLConnection
+from siki.basics import Exceptions
+
 
 def _has_keywords(arg):
     pattern = r"(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})"
@@ -34,32 +35,31 @@ def safe_insert(conn, db, table, args, debug=False):
     Returns:
     * [sql] str, command of sql
     """
-    
+
     res = _sql_args_check(db, table, args.keys(), args.values())
-    
+
     if res is False:
-        raise excepts.SQLInjectionException(
-            "SQL injection detected, params: table[{}], args[{}]".format(table, args))
+        raise Exceptions.SQLInjectionException(
+            f"SQL injection detected, params: table[{table}], args[{args}]")
 
     if conn is None:
-        raise excepts.InvalidParamException("conn cannot be null")
+        raise Exceptions.InvalidParamException("conn cannot be null")
 
     if type(args) is not dict:
-        raise excepts.InvalidParamException("args must be dict type")
+        raise Exceptions.InvalidParamException("args must be dict type")
 
     # generate a insert sql command
     keys = "`" + "`, `".join(args.keys()) + "`"
     values = "'" + "', '".join(args.values()) + "'"
 
     # generate insert sentence
-    STR_SQL = "INSERT INTO `{}`.`{}` ({}) VALUES ({})".format(db, table, keys, values)
+    str_sql = f"INSERT INTO `{db}`.`{table}` ({keys}) VALUES ({values})"
 
-    if debug: # for debug only
-        print(STR_SQL)
+    if debug:  # for debug only
+        print(str_sql)
 
     # executing sql command
-    return pys.execute(conn, STR_SQL)
-
+    return PySQLConnection.execute(conn, str_sql)
 
 
 def safe_query_id(conn, db, table, item_id, debug=False):
@@ -78,21 +78,20 @@ def safe_query_id(conn, db, table, item_id, debug=False):
     """
     res = _sql_args_check(db, table, item_id)
     if res is False:
-        raise excepts.SQLInjectionException(
-            "SQL injection detected, params: table[{}], id[{}]".format(table, item_id))
+        raise Exceptions.SQLInjectionException(
+            f"SQL injection detected, params: table[{table}], id[{item_id}]")
 
     if conn is None:
-        raise excepts.InvalidParamException("Conn cannot be null")
-    
+        raise Exceptions.InvalidParamException("Conn cannot be null")
+
     # generate query sentence
-    STR_SQL = "SELECT * FROM `{}`.`{}` WHERE `id`='{}'".format(db, table, item_id)
-    
-    if debug: # for debug only
-        print(STR_SQL)
+    str_sql = f"SELECT * FROM `{db}`.`{table}` WHERE `id`='{item_id}'"
+
+    if debug:  # for debug only
+        print(str_sql)
 
     # executing sql
-    return pys.query(conn, STR_SQL)
-
+    return PySQLConnection.query(conn, str_sql)
 
 
 def safe_simple_query(conn, db, table, select_con, where_con=None, order_by=None, debug=False):
@@ -113,27 +112,25 @@ def safe_simple_query(conn, db, table, select_con, where_con=None, order_by=None
     """
     res = _sql_args_check(db, table, select_con, where_con, order_by)
     if res is False:
-        raise excepts.SQLInjectionException(
-                "SQL injection detected, params: table[{}] select[{}] where[{}] order[{}]"
-                .format(table, select_con, where_con, order_by)
+        raise Exceptions.SQLInjectionException(
+            f"SQL injection detected, params: table[{table}] select[{select_con}] where[{where_con}] order[{order_by}]"
         )
-    
+
     if conn is None:
-        raise excepts.InvalidParamException("Conn cannot be null")
+        raise Exceptions.InvalidParamException("Conn cannot be null")
 
     # generate simple querying
-    STR_SQL = "SELECT {} FROM `{}`.`{}`".format(select_con, db, table)
+    str_sql = f'SELECT {select_con} FROM `{db}`.`{table}`'
     if where_con is not None:
-        STR_SQL += " WHERE {}".format(where_con)
+        str_sql += f' WHERE {where_con}'
     if order_by is not None:
-        STR_SQL += " ORDER BY {}".format(order_by)
+        str_sql += f' ORDER BY {order_by}'
 
-    if debug: # for debug only
-        print(STR_SQL)    
+    if debug:  # for debug only
+        print(str_sql)
 
-    # executing sql
-    return pys.query(conn, STR_SQL)
-
+        # executing sql
+    return PySQLConnection.query(conn, str_sql)
 
 
 def safe_update(conn, db, table, item_id, args, debug=False):
@@ -153,32 +150,30 @@ def safe_update(conn, db, table, item_id, args, debug=False):
     """
     res = _sql_args_check(db, table, item_id, args.keys(), args.values())
     if res is False:
-        raise excepts.SQLInjectionException(
-                "SQL injection detected, params: table[{}] item_id[{}] vals[{}]"
-                .format(table, item_id, args)
+        raise Exceptions.SQLInjectionException(
+            f"SQL injection detected, params: table[{table}] item_id[{item_id}] vals[{args}]"
         )
 
     if conn is None:
-        raise excepts.InvalidParamException("Conn cannot be null")
+        raise Exceptions.InvalidParamException("Conn cannot be null")
 
     # generate sql querying
-    setvals = []
+    setval = []
     for key, val in args.items():
         if val:
-            setvals.append("`" + str(key) + "`='" + str(val) + "'")
+            setval.append("`" + str(key) + "`='" + str(val) + "'")
         else:
-            setvals.append("`" + str(key) + "`=NULL")
-    pvals = ", ".join(setvals)
+            setval.append("`" + str(key) + "`=NULL")
+    p_vals = ", ".join(setval)
 
     # generate sql
-    STR_SQL = "UPDATE `{}`.`{}` SET {} WHERE `id`='{}'".format(db, table, pvals, item_id)
-    
-    if debug: # for debug only
-        print(STR_SQL)  
+    str_sql = f"UPDATE `{db}`.`{table}` SET {p_vals} WHERE `id`='{item_id}'"
 
-    # executing sql
-    return pys.execute(conn, STR_SQL)
+    if debug:  # for debug only
+        print(str_sql)
 
+        # executing sql
+    return PySQLConnection.execute(conn, str_sql)
 
 
 def safe_delete(conn, db, table, item_id, debug=False):
@@ -196,23 +191,21 @@ def safe_delete(conn, db, table, item_id, debug=False):
     """
     res = _sql_args_check(table, item_id)
     if res is False:
-        raise excepts.SQLInjectionException(
-                "SQL injection detected, params: table[{}] item_id[{}]"
-                .format(table, item_id)
+        raise Exceptions.SQLInjectionException(
+            f"SQL injection detected, params: table[{table}] item_id[{item_id}]"
         )
 
     if conn is None:
-        raise excepts.InvalidParamException("Conn cannot be null")
+        raise Exceptions.InvalidParamException("Conn cannot be null")
 
     # generate sql
-    STR_SQL = "DELETE FROM `{}`.`{}` WHERE `id` = '{}'".format(db, table, item_id)
+    str_sql = f"DELETE FROM `{db}`.`{table}` WHERE `id` = '{item_id}'"
 
-    if debug: # for deubg
-        print(STR_SQL)
-    
+    if debug:  # for deubg
+        print(str_sql)
+
     # executing sql
-    return pys.execute(conn, STR_SQL)
-
+    return PySQLConnection.execute(conn, str_sql)
 
 
 def safe_query_tables(conn, db):
@@ -229,22 +222,20 @@ def safe_query_tables(conn, db):
     """
     res = _sql_args_check(db)
     if res is False:
-        raise excepts.SQLInjectionException(
-                "SQL injection detected, params: db[{}]".format(db))
+        raise Exceptions.SQLInjectionException(f"SQL injection detected, params: db[{db}]")
 
     if conn is None:
-        raise excepts.InvalidParamException("Conn cannot be null")
+        raise Exceptions.InvalidParamException("Conn cannot be null")
 
     # generating sql
-    STR_SQL = "SHOW TABLES IN `{}`".format(db)
-    
-    # executing sql
-    rets = []
-    for i in pys.query(conn, STR_SQL): # obtaining a list
-        for k, v in i.items():
-            rets.append(v)
-    return rets
+    str_sql = f"SHOW TABLES IN `{db}`"
 
+    # executing sql
+    final_results = []
+    for i in PySQLConnection.query(conn, str_sql):  # obtaining a list
+        for k, v in i.items():
+            final_results.append(v)
+    return final_results
 
 
 def safe_query_columns(conn, db, table):
@@ -262,14 +253,13 @@ def safe_query_columns(conn, db, table):
     """
     res = _sql_args_check(db, table)
     if res is False:
-        raise excepts.SQLInjectionException(
-                "SQL injection detected, params: db[{}] table[{}]".format(db, table))
+        raise Exceptions.SQLInjectionException(f"SQL injection detected, params: db[{db}] table[{table}]")
 
     if conn is None:
-        raise excepts.InvalidParamException("Conn cannot be null")
-    
+        raise Exceptions.InvalidParamException("Conn cannot be null")
+
     # generating sql
-    STR_SQL = "SHOW COLUMNS IN `{}`.`{}`".format(db, table)
-    
+    str_sql = f'SHOW COLUMNS IN `{db}`.`{table}`'
+
     # executing sql
-    return pys.query(conn, STR_SQL) # obtaining a list
+    return PySQLConnection.query(conn, str_sql)  # obtaining a list
