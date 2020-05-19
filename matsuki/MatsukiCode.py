@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Apr 07, 2020
-# LastChg: Apr 07, 2020
+# Modified: Apr 07, 2020
 
 import enum
 

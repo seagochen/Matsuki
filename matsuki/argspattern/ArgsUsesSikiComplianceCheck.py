@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Feb 07, 2020
-# LastChg: Apr 07, 2020
+# Modified: Apr 07, 2020
 
 from siki.basics import Exceptions as excepts
 from siki.basics import Convert as convert

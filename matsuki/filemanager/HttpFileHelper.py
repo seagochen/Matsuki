@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Apr 10, 2020
-# LastChg: Apr 10, 2020
+# Modified: Apr 10, 2020
 
 import os
 from siki.basics import FileUtils, TimeTicker

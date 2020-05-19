@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Feb 21, 2020
-# LastChg: Apr 15, 2020
+# Modified: Apr 15, 2020
 
 from siki.basics import TimeTicker as ticker
 from siki.basics import Convert as convert

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Feb 07, 2020
-# LastChg: Apr 15, 2020
+# Modified: Apr 15, 2020
 
 import re
 from siki.basics import FileUtils
 from siki.basics import Exceptions
 from siki.basics import Convert
+
 
 class RegularToken(object):
 
@@ -14,7 +15,6 @@ class RegularToken(object):
         self.key = key
         self.mapping = mapping
         self.regular = regular
-
 
 
 class ArgsMappingToken(object):
@@ -25,7 +25,6 @@ class ArgsMappingToken(object):
     def __init__(self):
         self.tokens = []
 
-    
     def trim_tailer_from_text(self, text: str):
         """
         Windows and Linux systems have different line endings. These special symbols may cause regular matching to fail, so need to remove them all
@@ -34,9 +33,8 @@ class ArgsMappingToken(object):
             text = text.replace("\r\n", "")
         else:
             text = text.replace("\n", "")
-        
-        return text
 
+        return text
 
     def search_token(self, key):
         """
@@ -46,11 +44,9 @@ class ArgsMappingToken(object):
         for t in self.tokens:
             if t.key == key:
                 return t
-            
+
         return None
 
-
-    
     def use_args_regular_check(self, tokenList: list, args: dict):
         """
         Regularly match the parameters, if the format is correct, the data of the parameter will be retained, if it is wrong, it will be discarded
@@ -75,17 +71,13 @@ class ArgsMappingToken(object):
         # return to caller
         return finalDict
 
-
-    
     def clear_tokens(self):
         """
         cleaning up data caches
         """
         self.tokens.clear()
 
-    
-
-    def parsing_reg_file(self, ruleFile: str, args: dict):
+    def parsing_reg_file(self, rule_file: str, args: dict):
         """
         Parse the configuration file, and then verify the validity of the input parameters
 
@@ -100,22 +92,23 @@ class ArgsMappingToken(object):
         * [dict(str:obj)] dict type
         """
 
-        if not FileUtils.exists(ruleFile):
-            raise Exceptions.NoAvailableResourcesFoundException("file: {} not found".format(rulefile))
+        if not FileUtils.exists(rule_file):
+            raise Exceptions.NoAvailableResourcesFoundException("file: {} not found".format(rule_file))
 
         # parse the file
-        for line in open(ruleFile, "rt"):
-            # trim tailer
+        for line in open(rule_file, "rt"):
+            # trim tailor
             line = self.trim_tailer_from_text(line)
 
             # split token from spaces
             seps = line.split(' ')
-            
+
             # check size
             if len(seps) != 3:
-                raise Exceptions.InvalidArithException("regular line: {} is broken, [argument key] [mapping key] [regular expression]".format(line))
+                raise Exceptions.InvalidArithException("regular line: {} is broken, [argument key] [mapping key] ["
+                                                       "regular expression]".format(line))
 
-            # append regular token to list
+                # append regular token to list
             self.tokens.append(RegularToken(seps[0], seps[1], R"{}".format(seps[2])))
 
         # After parsing the file, first extract the dictionary consisting of {old key-regular match} from the file, 
@@ -123,7 +116,6 @@ class ArgsMappingToken(object):
         filtered_args = self.use_args_regular_check(self.tokens, args)
 
         return filtered_args
-
 
     def parsing_reg_rules(self, ruleList: list, args: dict):
         """
@@ -144,10 +136,11 @@ class ArgsMappingToken(object):
         for line in ruleList:
             # split token from spaces
             seps = line.split(' ')
-            
+
             # check size
             if len(seps) != 3:
-                raise Exceptions.InvalidArithException("regular line: {} is broken, [argument key] [mapping key] [regular expression]".format(line))
+                raise Exceptions.InvalidArithException(
+                    "regular line: {} is broken, [argument key] [mapping key] [regular expression]".format(line))
 
             # append regular token to list
             self.tokens.append(RegularToken(seps[0], seps[1], seps[2]))
@@ -159,7 +152,6 @@ class ArgsMappingToken(object):
         return filtered_args
 
 
-    
 def apply_reg_rules(rules, args):
     """
     Regular matching rules can be read from a file or from a matching list
@@ -167,12 +159,12 @@ def apply_reg_rules(rules, args):
 
     amt = ArgsMappingToken()
 
-    if isinstance(rules, str):# read from file
+    if isinstance(rules, str):  # read from file
         return amt.parsing_reg_file(rules, args)
-    
+
     if isinstance(rules, list):
         return amt.parsing_reg_rules(rules, args)
-    
+
     return None
 
 
@@ -184,9 +176,9 @@ if __name__ == "__main__":
     }
 
     rules = [
-        r"key1 to_key1 ^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$", # email
-        r"key2 to_key2 ^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$", # phone
-        r"key3 to_key3 ^[0-9]+$" # numbers
+        r"key1 to_key1 ^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$",  # email
+        r"key2 to_key2 ^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$",  # phone
+        r"key3 to_key3 ^[0-9]+$"  # numbers
     ]
 
     amt = ArgsMappingToken()

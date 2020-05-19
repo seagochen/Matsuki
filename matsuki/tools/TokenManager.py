@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Feb 07, 2020
-# LastChg: Apr 07, 2020
+# Modified: Apr 07, 2020
 
 import base64
 import random
@@ -38,15 +38,22 @@ def create_auth_token(secret_key : str, data : dict, expiration = 28800):
     Args:
     * [secret_key] the secret key to encode
     * [data] the data which encapsulated to the token 
-    * [expiration] out date time in seconds, default 60 x 60 x 8
+    * [expiration] out date time in seconds, default 60 x 60 x 8, set to 0 will be permanent available
     
     Returns:
     * [bytes] authorized token
     """
-    security = serializer(
-        secret_key=secret_key,
-        expires_in=expiration
-    )
+    # print(secret_key, "\n", data)
+
+    if expiration > 0:
+        security = serializer(
+            secret_key = secret_key,
+            expires_in = expiration
+        )
+    else:
+        security = serializer(
+            secret_key = secret_key
+        )
 
     timestamp = ticker.time_since1970()
     iat = {"iat": timestamp}

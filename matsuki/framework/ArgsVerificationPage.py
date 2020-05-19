@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Apr 09, 2020
-# LastChg: Apr 24, 2020
+# Modified: Apr 24, 2020
 
 from flask import request, jsonify
 
@@ -9,17 +9,12 @@ from matsuki.argspattern import ArgsUsesRegularExpression
 from matsuki.argspattern import ArgsUsesSikiComplianceCheck
 from matsuki.tools import FlaskRequestSimplify
 
-from matsuki.MatsukiCode import Code as ki
-from matsuki.MatsukiCode import encode
-from matsuki.HttpCode import Code as http
-from matsuki.HttpCode import response
-
 from werkzeug.local import LocalProxy
 
 from siki.basics import FileUtils
 
 
-def siki_verified_args(request: LocalProxy, xml: object, fromFile = True):
+def siki_verified_args(request: LocalProxy, xml: object, fromFile=True):
     """
     expand the parameters from the http request and simplify the process of obtaining the parameters
 
@@ -37,9 +32,9 @@ def siki_verified_args(request: LocalProxy, xml: object, fromFile = True):
     # simplify the HTTP request
     flask_args = FlaskRequestSimplify.simplify_request(request)
 
-    if flask_args[0] is None: # no variables found
+    if flask_args[0] is None:  # no variables found
         return False, "flask arguments are none", None
-    
+
     # verify parameters
     if fromFile and not FileUtils.exists(xml):
         return False, "rule file is broken", None
@@ -53,14 +48,12 @@ def siki_verified_args(request: LocalProxy, xml: object, fromFile = True):
     # return to caller filtered result
     if flask_args[1]:
         return True, args, flask_args[1]
-    
+
     else:
         return True, args, None
 
 
-
-
-def regular_verified_args(request: LocalProxy, rule: str, fromFile = True):
+def regular_verified_args(request: LocalProxy, rule: str):
     """
     expand the parameters from the http request and simplify the process of obtaining the parameters
 
@@ -78,11 +71,11 @@ def regular_verified_args(request: LocalProxy, rule: str, fromFile = True):
     # simplify the HTTP request
     flask_args = FlaskRequestSimplify.simplify_request(request)
 
-    if flask_args[0] is None: # no variables found
+    if flask_args[0] is None:  # no variables found
         return False, "flask arguments are none", None
-    
+
     # verify parameters
-    if fromFile and not FileUtils.exists(rule):
+    if not rule or not FileUtils.exists(rule):
         return False, "rule file is broken", None
 
     # update filtered arguments
@@ -94,6 +87,6 @@ def regular_verified_args(request: LocalProxy, rule: str, fromFile = True):
     # return to caller filtered result
     if flask_args[1]:
         return True, args, flask_args[1]
-    
+
     else:
         return True, args, None
