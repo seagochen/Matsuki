@@ -133,6 +133,52 @@ def safe_simple_query(conn, db, table, select_con, where_con=None, order_by=None
     return PySQLConnection.query(conn, str_sql)
 
 
+def safe_multiple_tables_query(conn, db: str, tables: list, select_con, where_con=None, order_by=None, debug=False):
+    """
+    safely multiple table cross querying, not allow nested querying to avoid sql injection.
+
+    Args:
+    * [conn] connection of sql
+    * [db] database name
+    * [tables] list of tables to query
+    * [select_con] selection condition
+    * [where_con] where condition
+    * [order_by] order by command, default sequency is asc, if you want a desc results, append "DESC" to your command
+    * [debug] default to False, if you wannar to see the output sql statement, make it to True
+
+    Returns:
+    * [rows(dict/list)] dict, the execution results
+    """
+    if not isinstance(tables, list):
+        raise Exceptions.InvalidParamException("tables must be a list")
+
+    res = _sql_args_check(db, *tables, select_con, where_con, order_by)
+    if res is False:
+        raise Exceptions.SQLInjectionException(
+            f"SQL injection detected, params: table[{tables}] select[{select_con}] where[{where_con}] order[{order_by}]"
+        )
+
+    if conn is None:
+        raise Exceptions.InvalidParamException("Conn cannot be null")
+
+    # generate simple querying
+    str_tables = ''
+    for t in tables:
+        str_tables += f"`{db}`.`{t}`,"
+
+    str_sql = f"SELECT {select_con} FROM {str_tables[:-1]}"
+    if where_con is not None:
+        str_sql += f' WHERE {where_con}'
+    if order_by is not None:
+        str_sql += f' ORDER BY {order_by}'
+
+    if debug:  # for debug only
+        print(str_sql)
+
+    # executing sql
+    return PySQLConnection.query(conn, str_sql)
+
+
 def safe_update(conn, db, table, item_id, args, debug=False):
     """
     safely updating database, and avoid sql injection attack

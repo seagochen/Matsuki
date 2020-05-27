@@ -17,7 +17,7 @@ class Code(enum.IntEnum):
     TOKEN_SIGNATURE_ERROR       = 0X00000020 # 0X0 00 0 0 0 2 0 - token signature invalid
     TOKEN_UNKNOWN_ERROR         = 0X000000F0 # 0X0 00 0 0 0 F 0 - unexcepted error
     TOKEN_VERIFY_PASSED         = 0X00000000 # 0X0 00 0 0 0 0 0 - token test passed
-    
+
     ##### DATABASE ERRORS ####                            *
     DATABASE_CONNECTION_ERROR   = 0X00000100 # 0X0 00 0 0 1 0 0 - database has connection error
     DATABASE_INVALID_STATEMENT  = 0X00000200 # 0X0 00 0 0 2 0 0 - database statement is invalid
@@ -46,7 +46,7 @@ class Code(enum.IntEnum):
     SERV_UNEXCEPT_ERROR         = 0X0FF00000 # 0X0 FF 0 0 0 0 0 # server side unexcepted error
     SERV_UNIMPLEMENTED_ERROR    = 0X0F100000 # 0X0 F1 0 0 0 0 0 # unimplemented method error
     SERVER_RAISED_EXCEPTION     = 0X0F200000 # 0X0 F2 0 0 00 0 # server side raised other exceptions
-  
+
 
 def encode(*codes):
     """
@@ -57,7 +57,7 @@ def encode(*codes):
     if len(codes) > 0:
         for c in codes:
             final_code = final_code | c
-    
+
     return final_code
 
 
@@ -85,7 +85,7 @@ def print_code(codes):
 
 
 
-if __name__ == "__main__":
-    from MatsukiCode import MatsukiCode as code
-    code = encode(code.SERV_UNEXCEPT_ERROR, code.CACHED_CONNECTION_ERROR, code.DATABASE_CONNECTION_ERROR)
-    print_code(decode(code))
+# if __name__ == "__main__":
+#     from MatsukiCode import MatsukiCode as code
+#     code = encode(code.SERV_UNEXCEPT_ERROR, code.CACHED_CONNECTION_ERROR, code.DATABASE_CONNECTION_ERROR)
+#     print_code(decode(code))

@@ -1,12 +1,24 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 08, 2018
-# Modifi: Mar 11, 2020
+# Modified: Mar 11, 2020
 
 import pymysql
-from siki.basics.Exceptions import *
-from siki.basics import ParametersCheck as paramc
 
+from siki.basics.Exceptions import *
+
+
+def check_null_params(**dict_args):
+    """
+    checking the input parameters, filter out the nulls
+    """
+    if len(dict_args) > 0:
+        null_keys = []
+        for key, val in dict_args.items():
+            if val is None:
+                null_keys.append(key)
+        return len(null_keys) > 0, null_keys
+    return False, None
 
 
 def connect(password, user="root", host="127.0.0.1", port=3306):
@@ -22,8 +34,8 @@ def connect(password, user="root", host="127.0.0.1", port=3306):
     @Returns:
     * 【connection] to the database
     """
-    res, nullkeys = paramc.check_null_params(user=user, password=password, host=host, port=port)
-    
+    res, null_keys = check_null_params(user=user, password=password, host=host, port=port)
+
     if res is True:
         raise InvalidParamException("parameters cannot be null!")
 
