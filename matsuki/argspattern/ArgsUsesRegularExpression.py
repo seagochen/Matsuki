@@ -47,12 +47,12 @@ class ArgsMappingToken(object):
 
         return None
 
-    def use_args_regular_check(self, tokenList: list, args: dict):
+    def use_args_regular_check(self, args: dict):
         """
         Regularly match the parameters, if the format is correct, the data of the parameter will be retained, if it is wrong, it will be discarded
         """
 
-        finalDict = {}
+        final_dict = {}
 
         # first, verify keys from second variable are matches to first variable
         for key, val in args.items():
@@ -60,16 +60,15 @@ class ArgsMappingToken(object):
 
             if not token:
                 continue
-                # raise Exceptions.NoAvailableResourcesFoundException("key: {} in args not matched to token list".format(key))
 
             # do regular check
             if re.match(token.regular, val) is not None:
-                finalDict[token.mapping] = val
+                final_dict[token.mapping] = val
             else:
-                finalDict[token.mapping] = None
+                final_dict[token.mapping] = None
 
         # return to caller
-        return finalDict
+        return final_dict
 
     def clear_tokens(self):
         """
@@ -80,9 +79,6 @@ class ArgsMappingToken(object):
     def parsing_reg_file(self, rule_file: str, args: dict):
         """
         Parse the configuration file, and then verify the validity of the input parameters
-
-        the format of rulefile:
-        [argument key] [mapping key] [regular expression]
 
         @Args:
         * [ruleFile] str, path of file
@@ -113,11 +109,11 @@ class ArgsMappingToken(object):
 
         # After parsing the file, first extract the dictionary consisting of {old key-regular match} from the file, 
         # and then perform regular filtering on the parameters
-        filtered_args = self.use_args_regular_check(self.tokens, args)
+        filtered_args = self.use_args_regular_check(args)
 
         return filtered_args
 
-    def parsing_reg_rules(self, ruleList: list, args: dict):
+    def parsing_reg_rules(self, rule_list: list, args: dict):
         """
         Parse the configuration list, and then verify the validity of the input parameters
 
@@ -133,7 +129,7 @@ class ArgsMappingToken(object):
         """
 
         # parse the file
-        for line in ruleList:
+        for line in rule_list:
             # split token from spaces
             seps = line.split(' ')
 
@@ -147,23 +143,23 @@ class ArgsMappingToken(object):
 
         # After parsing the file, first extract the dictionary consisting of {old key-regular match} from the file, 
         # and then perform regular filtering on the parameters
-        filtered_args = self.use_args_regular_check(self.tokens, args)
+        filtered_args = self.use_args_regular_check(args)
 
         return filtered_args
 
 
-def apply_reg_rules(rules, args):
+def apply_reg_rules(rule, args):
     """
     Regular matching rules can be read from a file or from a matching list
     """
 
     amt = ArgsMappingToken()
 
-    if isinstance(rules, str):  # read from file
-        return amt.parsing_reg_file(rules, args)
+    if isinstance(rule, str):  # read from file
+        return amt.parsing_reg_file(rule, args)
 
-    if isinstance(rules, list):
-        return amt.parsing_reg_rules(rules, args)
+    if isinstance(rule, list):
+        return amt.parsing_reg_rules(rule, args)
 
     return None
 
